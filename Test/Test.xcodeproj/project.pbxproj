@@ -16,6 +16,7 @@
 		585C50712C0DE7AE00AB6CF3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 585C50702C0DE7AE00AB6CF3 /* Assets.xcassets */; };
 		585C50742C0DE7AE00AB6CF3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 585C50722C0DE7AE00AB6CF3 /* LaunchScreen.storyboard */; };
 		585C507C2C0DEA5600AB6CF3 /* RestAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585C507B2C0DEA5600AB6CF3 /* RestAPI.swift */; };
+		5876CAC72C103E1100F06A84 /* StuctData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5876CAC62C103E1100F06A84 /* StuctData.swift */; };
 		58ECFC495AC838895BC01139 /* Pods_Test.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 15367BA2A52A221A1F6B307F /* Pods_Test.framework */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +34,7 @@
 		585C50732C0DE7AE00AB6CF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		585C50752C0DE7AE00AB6CF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		585C507B2C0DEA5600AB6CF3 /* RestAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestAPI.swift; sourceTree = "<group>"; };
+		5876CAC62C103E1100F06A84 /* StuctData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StuctData.swift; sourceTree = "<group>"; };
 		DF0D6C7F83E39CF99CF5AABD /* Pods-Test.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Test.debug.xcconfig"; path = "Target Support Files/Pods-Test/Pods-Test.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +90,7 @@
 				585C50752C0DE7AE00AB6CF3 /* Info.plist */,
 				585C507B2C0DEA5600AB6CF3 /* RestAPI.swift */,
 				5852CDC02C0E03DA00E6C863 /* Globalvar.swift */,
+				5876CAC62C103E1100F06A84 /* StuctData.swift */,
 			);
 			path = Test;
 			sourceTree = "<group>";
@@ -219,6 +222,7 @@
 				585C507C2C0DEA5600AB6CF3 /* RestAPI.swift in Sources */,
 				5852CDC12C0E03DA00E6C863 /* Globalvar.swift in Sources */,
 				585C506C2C0DE7AD00AB6CF3 /* ViewController.swift in Sources */,
+				5876CAC72C103E1100F06A84 /* StuctData.swift in Sources */,
 				585C50682C0DE7AD00AB6CF3 /* AppDelegate.swift in Sources */,
 				585C506A2C0DE7AD00AB6CF3 /* SceneDelegate.swift in Sources */,
 			);

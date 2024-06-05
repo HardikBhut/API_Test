@@ -13,113 +13,159 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
-        self.register(strEmail: "hardikbhut.1986@gmail.com", strPassword: "abc@1234") // for register
-        self.login(strEmail: "hardikbhut.1986@gmail.com", strPassword: "abc@1234") // for login
-        self.getData() // for inspection data
-        self.sbumitInspection() // for submit data
+      
+        registration(stremail: "test@gmail.com", strpassword: "test@1234")
+        login(stremail: "test@gmail.com", strpassword: "test@1234")
+        GetData()
+        SubmitAPI()
         
     }
     
-    func register(strEmail: String, strPassword : String) {
-       
-        let inputJson = ["email": strEmail,
-                         "password": strPassword]
-     
-        RestAPI.sharedInstance.executeCommonRequest(parameter: inputJson, strFunName: "register")
-        { result, error in
-            
-            if error == nil {
-                
-                let responce = result as! NSDictionary
-                print(responce)
-               
-            } else {
-               
-                print(error?.localizedDescription ?? "")
-            
+    func registration(stremail : String , strpassword : String) {
+        
+        let callurl = Globalvar.BaseURL.appending("register")
+        guard let url = URL(string: callurl) else {
+            print("Invalid URL")
+            return
+        }
+        
+        let loginRequest  = LoginRequest(email: stremail, password: strpassword)
+        
+        // Send the request
+        URLSessionManager.shared.sendRequest(url: url, method: "POST", body: loginRequest) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) {
+                        print("Response JSON: \(jsonResponse)")
+                    } else {
+                        print("Response Data: \(String(data: data, encoding: .utf8) ?? "Invalid response data")")
+                    }
+                } catch {
+                    print("Failed to handle response: \(error)")
+                }
+            case .failure(let error):
+                print("Error: \(error)")
+            }
+        }
+        
+    }
+    
+    func login(stremail : String , strpassword : String) {
+        
+        let callurl = Globalvar.BaseURL.appending("login")
+        guard let url = URL(string: callurl) else {
+            print("Invalid URL")
+            return
+        }
+        
+        let loginRequest  = LoginRequest(email: "h@gmail.com", password: "Test@1234")
+        
+        // Send the request
+        URLSessionManager.shared.sendRequest(url: url, method: "POST", body: loginRequest) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) {
+                        print("Response JSON: \(jsonResponse)")
+                    } else {
+                        print("Response Data: \(String(data: data, encoding: .utf8) ?? "Invalid response data")")
+                    }
+                } catch {
+                    print("Failed to handle response: \(error)")
+                }
+            case .failure(let error):
+                print("Error: \(error)")
+            }
+        }
+        
+    }
+    
+    func GetData() {
+        
+        let callurl = Globalvar.BaseURL.appending("inspections/start")
+        
+        guard let url = URL(string: callurl) else {
+            print("Invalid URL")
+            return
+        }
+        
+        // Send the request
+        URLSessionManager.shared.sendRequest(url: url, method: "GET") { result in
+            switch result {
+            case .success(let data):
+                do {
+                    if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) {
+                        print("Response JSON: \(jsonResponse)")
+                    } else {
+                        print("Response Data: \(String(data: data, encoding: .utf8) ?? "Invalid response data")")
+                    }
+                } catch {
+                    print("Failed to handle response: \(error)")
+                }
+            case .failure(let error):
+                print("Error: \(error)")
+            }
+        }
+        
+    }
+    
+    func SubmitAPI() {
+        
+        let callurl = Globalvar.BaseURL.appending("inspections/submit")
+        
+        guard let url = URL(string: callurl) else {
+            print("Invalid URL")
+            return
+        }
+        
+        // Create the answer choices
+        let answerChoice1 = AnswerChoiceModel(id: 1, text: "Yes")
+        let answerChoice2 = AnswerChoiceModel(id: 2, text: "No")
+        let answerChoices = [answerChoice1, answerChoice2]
+        
+        // Create the inspection object
+        let inspection = Inspection(id: 1, name: "Is the drugs trolley locked?", answerChoices: answerChoices, selectedAnswerChoiceId: 1)
+        let submitRequest = InspectionSubmitRequest(inspection: inspection)
+        
+        // Print the JSON to debug
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let jsonData = try encoder.encode(submitRequest)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                print("JSON to be sent: \(jsonString)")
+            }
+        } catch {
+            print("Failed to encode request: \(error)")
+            return
+        }
+        
+        // Send the request
+        URLSessionManager.shared.sendRequest(url: url, method: "POST", body: submitRequest) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    if let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) {
+                        print("Response JSON: \(jsonResponse)")
+                    } else {
+                        print("Response Data: \(String(data: data, encoding: .utf8) ?? "Invalid response data")")
+                    }
+                } catch {
+                    print("Failed to handle response: \(error)")
+                }
+            case .failure(let error):
+                print("Error: \(error)")
             }
         }
     }
     
-    func login(strEmail: String, strPassword : String) {
-        
-        let inputJson = ["email": strEmail,
-                         "password": strPassword]
-     
-        RestAPI.sharedInstance.executeCommonRequest(parameter: inputJson, strFunName: "login")
-        { result, error in
-            
-            if error == nil {
 
-                let responce = result as! NSDictionary
-                print(responce)
-            
-               
-            } else {
-                
-                print(error?.localizedDescription ?? "")
-               
-            }
-        }
-    }
-    
-    func getData()
-    {
-        RestAPI.sharedInstance.executerGetCommonRequest(strFunName: "inspections/start")
-        { result, error in
-            
-            if error == nil {
-                
-                // self.removeHUD()
-                let responce = result as! NSDictionary
-                //let keyExists = responce["isSuccessfull"] != nil
-                print(responce)
-                
-            } else {
-                
-                print(error?.localizedDescription ?? "")
-                
-            }
-        }
-    }
-    
-    func sbumitInspection()
-    {
-        let tampArray = NSMutableArray()
-        
-        let inputJsonAnswer = ["questions": "Is the drugs trolley locked?",
-                                   "answer": "No",
-                                   ]
-        
-        tampArray.add(inputJsonAnswer)
-        
-        
-        let inputJson = ["inspectionId": "13",
-                         "inspectionType": "Clinical",
-                         "survy" : tampArray] as [String : Any]
-       
-        
-        print(inputJson)
-     
-        RestAPI.sharedInstance.executeCommonRequest(parameter: inputJson, strFunName: "inspections/submit")
-        { result, error in
-            
-            if error == nil {
-                
-                let responce = result as! NSDictionary
-                print(responce)
-               
-            } else {
-               
-                print(error?.localizedDescription ?? "")
-            
-            }
-        }
-    }
     
   
 }
+    
+  
 
 
 

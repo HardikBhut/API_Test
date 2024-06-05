@@ -6,199 +6,61 @@
 //
 
 import Foundation
-import Alamofire
 
-final class RestAPI : NSObject{
+class URLSessionManager {
+    static let shared = URLSessionManager()
     
-    static let sharedInstance = RestAPI()
-    private override init() {}
+    private let session: URLSession
     
-    // MARK: =====================  Web Service Common Method For Get ========================== //
-    func executerGetCommonRequest(strFunName: String , completion: @escaping (_ success: Any? ,_ failresult: Error? ) -> Void)
-    {
-        let url = Globalvar.BaseURL.appending(strFunName)
-        print("REQUEST URL:\n\(url)")
-        let baseURl = URL(string: url)
-        var mRequest = URLRequest(url:baseURl!)
-        mRequest.httpMethod =  "GET"
-        mRequest.addValue("application/json", forHTTPHeaderField:"Accept")
-        
-        AF.request(mRequest).responseJSON
-        { response in
-            
-            switch response.result
-            {
-
-            case .success(let value):
-                
-                print(response.response?.statusCode ?? "")
-                
-                if let jsonDict = value as? NSDictionary {
-                    
-                    let data = try! JSONSerialization.data(withJSONObject: value as Any, options: .prettyPrinted)
-                    let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-                    print("RESPONSE JSON:\n\(string as AnyObject)")
-                    
-                    completion(jsonDict,nil)
-                } else if let jsonDict = value as? NSArray {
-                    
-                    let data = try! JSONSerialization.data(withJSONObject: value as Any, options: .prettyPrinted)
-                    let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-                    print("RESPONSE JSON:\n\(string as AnyObject)")
-                    
-                    completion(jsonDict,nil)
-                }
-                
-            case .failure(let error):
-                print(error.localizedDescription)
-                switch (response.error!._code)
-                {
-                case NSURLErrorTimedOut:
-                    print(response.error ?? "0")
-                    completion(["message":"Error occured"],error)
-                    break
-                case NSURLErrorNotConnectedToInternet:
-                    completion(["message":"Please check internet connection"],error)
-                    break
-                default:
-                    completion(["message":"Error occured"],error)
-                }
-            }
-        }
+    private init() {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 30.0
+        configuration.timeoutIntervalForResource = 60.0
+        session = URLSession(configuration: configuration)
     }
     
-    // MARK: =====================  Web Service Common Method For Post ========================== //
-    
-    func executeCommonRequest( parameter:[String:Any],strFunName: String , completion: @escaping (_ success: Any? ,_ failresult: Error? ) -> Void)
-    {
-        //enableCertificatePinning()
-       
-        let url = Globalvar.BaseURL.appending(strFunName)
-        print("REQUEST URL:\n\(url)")
-        let baseURl = URL(string: url)
-        var mRequest = URLRequest(url:baseURl!)
-        mRequest.httpMethod =  "POST"
+    func sendRequest<T: Codable>(url: URL, method: String, body: T?, completion: @escaping (Result<Data, Error>) -> Void) {
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let data = try! JSONSerialization.data(withJSONObject: parameter, options: JSONSerialization.WritingOptions.prettyPrinted)
-        let json = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-        print("REQUEST JSON:\n\(json as AnyObject)")
-        
-        let headers = ["content-type": "application/json",
-                       "cache-control": "no-cache"]
-        
-
-        
-        mRequest.allHTTPHeaderFields = headers
-        let postData = (try? JSONSerialization.data(withJSONObject: parameter, options: []))
-        
-        mRequest.httpBody = postData!
-        
-        AF.request(mRequest).responseJSON
-        { response in
-            
-            print(response.response?.statusCode ?? "")
-            
-            switch response.result {
-                
-            case .success(let value):
-                
-                if let jsonDict = value as? NSDictionary {
-                    
-                    let data = try! JSONSerialization.data(withJSONObject: value as Any, options: .prettyPrinted)
-                    let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-                    print("RESPONSE JSON:\n\(string as AnyObject)")
-                    
-                    completion(jsonDict,nil)
-                } else if let jsonDict = value as? NSArray {
-                    
-                    let data = try! JSONSerialization.data(withJSONObject: value as Any, options: .prettyPrinted)
-                    let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-                    print("RESPONSE JSON:\n\(string as AnyObject)")
-                    
-                    completion(jsonDict,nil)
-                }
-                
-            case .failure(let error):
-                print(error.localizedDescription)
-                switch (response.error!._code) {
-                case NSURLErrorTimedOut:
-                    print(response.error ?? "0")
-                    completion(["message":"Error occured"],error)
-                    break
-                case NSURLErrorNotConnectedToInternet:
-                    completion(["message":"Please check internet connection"],error)
-                    break
-                default:
-                    completion(["message":"Error occured"],error)
-                }
+        if let body = body {
+            do {
+                let encoder = JSONEncoder()
+                request.httpBody = try encoder.encode(body)
+            } catch {
+                completion(.failure(error))
+                return
             }
         }
-    }
-    
-    func executeUploadCommonRequest( parameter:Data ,strFunName: String , completion: @escaping (_ success: Any? ,_ failresult: Error? ) -> Void)
-    {
-        let url = Globalvar.BaseURL.appending(strFunName)
-        print("REQUEST URL:\n\(url)")
-        let baseURl = URL(string: url)
-        var mRequest = URLRequest(url:baseURl!)
-        mRequest.httpMethod =  "POST"
-   
         
-        let headers = ["content-type": "application/json",
-                       "cache-control": "no-cache"]
-        
-        mRequest.allHTTPHeaderFields = headers
-      
-        mRequest.httpBody = parameter
-        
-        AF.request(mRequest).responseJSON
-        { response in
-            
-            switch response.result {
-            case .success(let value):
-                
-//                URLSessionInstrumentation.enable(
-//                    with: .init(
-//                        delegateClass: SessionDelegate.self
-//                    )
-//                )
-//                let session = URLSession(
-//                    configuration: .default,
-//                    delegate: SessionDelegate(),
-//                    delegateQueue: nil
-//                )
-                
-                if let jsonDict = value as? NSDictionary {
-                    
-                    let data = try! JSONSerialization.data(withJSONObject: value, options: .prettyPrinted)
-                    let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-                    print("RESPONSE JSON:\n\(string as AnyObject)")
-                    
-                    completion(jsonDict,nil)
-                } else if let jsonDict = value as? NSArray {
-                    
-                    let data = try! JSONSerialization.data(withJSONObject: value, options: .prettyPrinted)
-                    let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-                    print("RESPONSE JSON:\n\(string as AnyObject)")
-                    
-                    completion(jsonDict,nil)
-                }
-                
-            case .failure(let error):
-                print(error.localizedDescription)
-                switch (response.error!._code) {
-                case NSURLErrorTimedOut:
-                    print(response.error ?? "0")
-                    completion(["message":"Error occured"],error)
-                    break
-                case NSURLErrorNotConnectedToInternet:
-                    completion(["message":"Please check internet connection"],error)
-                    break
-                default:
-                    completion(["message":"Error occured"],error)
-                }
+        let task = session.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
             }
+            
+            guard let httpResponse = response as? HTTPURLResponse, 200..<300 ~= httpResponse.statusCode else {
+                let statusError = NSError(domain: "Invalid response", code: (response as? HTTPURLResponse)?.statusCode ?? 0, userInfo: nil)
+                completion(.failure(statusError))
+                return
+            }
+            
+            guard let data = data else {
+                let noDataError = NSError(domain: "No data", code: 0, userInfo: nil)
+                completion(.failure(noDataError))
+                return
+            }
+            
+            completion(.success(data))
         }
+        
+        task.resume()
     }
     
+    func sendRequest(url: URL, method: String, completion: @escaping (Result<Data, Error>) -> Void) {
+        sendRequest(url: url, method: method, body: Optional<EmptyBody>.none, completion: completion)
+    }
+    
+    private struct EmptyBody: Codable {}
 }
