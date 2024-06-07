@@ -19,6 +19,9 @@ class ViewController: UIViewController {
         GetData()
         SubmitAPI()
         
+
+        
+    
     }
     
     func registration(stremail : String , strpassword : String) {
@@ -59,7 +62,7 @@ class ViewController: UIViewController {
             return
         }
         
-        let loginRequest  = LoginRequest(email: "h@gmail.com", password: "Test@1234")
+        let loginRequest  = LoginRequest(email: stremail, password: strpassword)
         
         // Send the request
         URLSessionManager.shared.sendRequest(url: url, method: "POST", body: loginRequest) { result in
